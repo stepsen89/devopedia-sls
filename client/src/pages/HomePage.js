@@ -3,15 +3,18 @@ import { getEntries } from "../api/api";
 import { Link } from "react-router-dom";
 import { authConfig } from "../config";
 import dateFormat from "dateformat";
+import update from "immutability-helper";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { updateEntry } from "../api/api";
+import { updateEntry, deleteEntry } from "../api/api";
 class Home extends React.Component {
   state = {
     testing: true,
     loadingEntries: false,
+    entries: [],
   };
+
   async componentDidMount() {
     try {
       const entries = await getEntries(this.props.auth.getIdToken());
@@ -32,7 +35,7 @@ class Home extends React.Component {
     });
   };
 
-  onLearnClick = (entry) => {
+  onLearnClick = (entry, index) => {
     const MySwal = withReactContent(Swal);
 
     console.log("link", entry.link);
@@ -40,9 +43,13 @@ class Home extends React.Component {
     if (entry.link) {
       console.log("link is there");
       content =
-        `${entry.description || "no description"} ` +
-        `<hr>` +
-        `<a href="//sweetalert2.github.io">${entry.link}</a>`;
+        `<div style="text-align: justify"> <b> Description: </b> ` +
+        ` <p style="padding-top: 20px">${
+          entry.description || "Oh nothing here .... "
+        } </p></div> ` +
+        `<hr style="padding-bottom: 20px; margin-top: 20px">` +
+        `<div style="text-align: left"><b>More info:</b> ` +
+        `<a href=${entry.link} target="_blank" style="color: blue" >${entry.link}</a></div>`;
     } else {
       content = `${entry.description || "no description"} `;
     }
@@ -52,10 +59,10 @@ class Home extends React.Component {
       text: entry.description,
       icon: "question",
       html: content,
-      showConfirmButton: true,
+      showConfirmButton: entry.done ? false : true,
       showCancelButton: true,
       confirmButtonText: "Got it!",
-      cancelButtonText: "Not sure",
+      cancelButtonText: entry.done ? "Cancel" : "No, not sure",
     }).then((result) => {
       if (result.isConfirmed) {
         console.log("has repeated it");
@@ -73,21 +80,35 @@ class Home extends React.Component {
         console.log(entry);
         updateEntry(this.props.auth.getIdToken(), entry.entryId, entry).then(
           (e) => {
-            console.log(e);
-            this.props.history.push("/");
+            this.setState({
+              entries: update(this.state.entries, {
+                [index]: { repeated: { $set: entry.repeated } },
+                [index]: { done: { $set: entry.done } },
+              }),
+            });
           }
         );
       }
-      if (result.isDismissed) {
-        console.log("has dismissed it");
-      }
     });
+  };
+
+  deleteEntry = async (entryId: string) => {
+    try {
+      await deleteEntry(this.props.auth.getIdToken(), entryId);
+      this.setState({
+        entries: this.state.entries.filter(
+          (entry) => entry.entryId !== entryId
+        ),
+      });
+    } catch {
+      alert("Entry deletion failed");
+    }
   };
 
   render() {
     return (
       <Fragment>
-        <div class='container flex justify-center flex-col mx-auto'>
+        <div className='container flex justify-center flex-col mx-auto'>
           <Link
             className=' hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded w-max self-center'
             to='/entries/new'
@@ -97,29 +118,39 @@ class Home extends React.Component {
           </Link>
           {console.log(this.state.entries)}
           {this.state && this.state.entries && this.state.entries.length > 0 ? (
-            <div class='flex flex-col mt-8 '>
-              <div class='w-max self-center'>
-                <div class='border-b border-gray-200 shadow'>
-                  <table class='divide-y divide-gray-300 '>
-                    <thead class='bg-blue-100'>
+            <div className='flex flex-col mt-8 '>
+              <div className='w-max self-center'>
+                <div className='border-b border-gray-200 shadow'>
+                  <table className='divide-y divide-gray-300 '>
+                    <thead className='bg-blue-100'>
                       <tr>
-                        <th class='px-6 py-2 text-xs text-gray-500'>Title</th>
-                        <th class='px-6 py-2 text-xs text-gray-500'>
+                        <th className='px-6 py-2 text-xs text-gray-500'>
+                          Title
+                        </th>
+                        <th className='px-6 py-2 text-xs text-gray-500'>
                           Repeated
                         </th>
-                        <th class='px-6 py-2 text-xs text-gray-500'>
+                        <th className='px-6 py-2 text-xs text-gray-500'>
                           Completed
                         </th>
-                        <th class='px-6 py-2 text-xs text-gray-500'>Added</th>
-                        <th class='px-6 py-2 text-xs text-gray-500'>Action</th>
-                        <th class='px-6 py-2 text-xs text-gray-500'>Edit</th>
-                        <th class='px-6 py-2 text-xs text-gray-500'>Delete</th>
+                        <th className='px-6 py-2 text-xs text-gray-500'>
+                          Added
+                        </th>
+                        <th className='px-6 py-2 text-xs text-gray-500'>
+                          Action
+                        </th>
+                        <th className='px-6 py-2 text-xs text-gray-500'>
+                          Edit
+                        </th>
+                        <th className='px-6 py-2 text-xs text-gray-500'>
+                          Delete
+                        </th>
                       </tr>
                     </thead>
-                    <tbody class='bg-white divide-y divide-gray-300'>
+                    <tbody className='bg-white divide-y divide-gray-300'>
                       {this.state &&
                         this.state.entries &&
-                        this.state.entries.map((entry) => {
+                        this.state.entries.map((entry, index) => {
                           return (
                             <tr class='whitespace-nowrap' key={entry.entryId}>
                               <td class='px-6 py-4 text-sm text-gray-500'>
@@ -146,7 +177,9 @@ class Home extends React.Component {
                               </td>
                               <td class='px-6 py-4'>
                                 <button
-                                  onClick={() => this.onLearnClick(entry)}
+                                  onClick={() =>
+                                    this.onLearnClick(entry, index)
+                                  }
                                   class='px-4 py-1 text-sm text-black bg-yellow-200 rounded-full border-2 border-black'
                                 >
                                   {entry.done ? "View" : "Learn"}
