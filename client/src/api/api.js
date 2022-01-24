@@ -33,12 +33,12 @@ export async function createEntry(
 
 export async function updateEntry(
   idToken: string,
-  todoId: string,
-  updatedTodo: UpdateTodoRequest
+  entryId: string,
+  updatedEntry: UpdateTodoRequest
 ): Promise<void> {
-  await Axios.patch(
+  await axios.patch(
     `${apiEndpoint}/entries/${entryId}`,
-    JSON.stringify(updatedTodo),
+    JSON.stringify(updatedEntry),
     {
       headers: {
         "Content-Type": "application/json",

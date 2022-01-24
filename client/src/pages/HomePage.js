@@ -6,6 +6,7 @@ import dateFormat from "dateformat";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { updateEntry } from "../api/api";
 class Home extends React.Component {
   state = {
     testing: true,
@@ -51,7 +52,32 @@ class Home extends React.Component {
       showCancelButton: true,
       confirmButtonText: "Got it!",
       cancelButtonText: "Not sure",
-    }).then((e) => console.log(e));
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log("has repeated it");
+        console.log(entry.repeated);
+        if (entry.repeated && entry.repeated < entry.repeatingTimes) {
+          entry.repeated += 1;
+        } else {
+          entry.repeated = 1;
+        }
+        if (entry.repeatingTimes === entry.repeated) {
+          entry.done = true;
+        } else {
+          entry.done = false;
+        }
+        console.log(entry);
+        updateEntry(this.props.auth.getIdToken(), entry.entryId, entry).then(
+          (e) => {
+            console.log(e);
+            this.props.history.push("/");
+          }
+        );
+      }
+      if (result.isDismissed) {
+        console.log("has dismissed it");
+      }
+    });
   };
 
   render() {
@@ -65,7 +91,7 @@ class Home extends React.Component {
             {" "}
             Create new entry{" "}
           </Link>
-
+          {console.log(this.state.entries)}
           {this.state && this.state.entries && this.state.entries.length > 0 ? (
             <div class='flex flex-col mt-8 '>
               <div class='w-max self-center'>
@@ -80,7 +106,8 @@ class Home extends React.Component {
                         <th class='px-6 py-2 text-xs text-gray-500'>
                           Completed
                         </th>
-                        <th class='px-6 py-2 text-xs text-gray-500'>Learn</th>
+                        <th class='px-6 py-2 text-xs text-gray-500'>Added</th>
+                        <th class='px-6 py-2 text-xs text-gray-500'>Action</th>
                         <th class='px-6 py-2 text-xs text-gray-500'>Edit</th>
                         <th class='px-6 py-2 text-xs text-gray-500'>Delete</th>
                       </tr>
@@ -105,6 +132,11 @@ class Home extends React.Component {
                                     : " - "}
                                 </div>
                               </td>
+                              <td class='px-6 py-4'>
+                                <div class='text-sm text-gray-500'>
+                                  {entry.done ? "DONE" : ""}
+                                </div>
+                              </td>
                               <td class='px-6 py-4 text-sm text-gray-500'>
                                 {dateFormat(entry.createdAt, "dd/mm/yyyy")}
                               </td>
@@ -113,7 +145,7 @@ class Home extends React.Component {
                                   onClick={() => this.onLearnClick(entry)}
                                   class='px-4 py-1 text-sm text-black bg-yellow-200 rounded-full border-2 border-black'
                                 >
-                                  Learn
+                                  {entry.done ? "View" : "Learn"}
                                 </button>
                               </td>
                               <td class='px-6 py-4'>
