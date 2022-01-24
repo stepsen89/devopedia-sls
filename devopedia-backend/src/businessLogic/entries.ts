@@ -3,10 +3,10 @@ import * as uuid from "uuid";
 import { EntryAccess } from "../dataLayer/entriesAccess";
 
 import { EntryItem } from "../models/EntryItem";
-// import { EntryUpdate } from "../models/TodoUpdate";
+import { EntryUpdate } from "../models/EntryUpdate";
 
 import { CreateEntryRequest } from "../requests/CreateEntryRequest";
-// import { UpdateTodoRequest } from "../requests/UpdateTodoRequest";
+import { UpdateEntryRequest } from "../requests/UpdateEntryRequest";
 
 import { createLogger } from "../utils/logger";
 
@@ -32,30 +32,36 @@ export async function createEntry(
   return await entryAccess.createEntry({
     entryId: id,
     userId,
+    done: createEntryRequest.done,
     title: createEntryRequest.title,
     repeatingTimes: createEntryRequest.repeatingTimes,
     description: createEntryRequest.description,
+    link: createEntryRequest.link,
     createdAt: new Date().toISOString(),
   });
 }
 
-// export async function updateTodo(
-//   updateTodoRequest: UpdateTodoRequest,
-//   todoId: string,
-//   userId: string
-// ): Promise<TodoUpdate> {
-//   logger.info("Business Logic: Update Todo");
+export async function updateEntry(
+  updateEntryRequest: UpdateEntryRequest,
+  entryId: string,
+  userId: string
+): Promise<EntryUpdate> {
+  logger.info("Business Logic: Update Entry");
 
-//   return await todosAccess.updateTodo(
-//     {
-//       todoId: todoId,
-//       name: updateTodoRequest.name,
-//       done: updateTodoRequest.done,
-//       dueDate: updateTodoRequest.dueDate,
-//     },
-//     userId
-//   );
-// }
+  return await entryAccess.updateEntry(
+    {
+      entryId: entryId,
+      title: updateEntryRequest.title,
+      repeated: updateEntryRequest.repeated,
+      done: updateEntryRequest.done,
+      description: updateEntryRequest.description,
+      repeatingTimes: updateEntryRequest.repeatingTimes,
+      updatedAt: new Date().toISOString(),
+      link: updateEntryRequest.link,
+    },
+    userId
+  );
+}
 
 // export async function deleteTodo(todoId: string, userId: string) {
 //   logger.info("Business Logic: Delete Todo");

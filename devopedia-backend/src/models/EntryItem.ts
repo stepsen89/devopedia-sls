@@ -6,5 +6,6 @@ export interface EntryItem {
   title: string;
   description: string;
   repeatingTimes?: number;
-  links?: string;
+  link?: string;
+  done: boolean;
 }

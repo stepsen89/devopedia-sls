@@ -2,6 +2,7 @@ import * as AWS from "aws-sdk";
 const AWSXRay = require("aws-xray-sdk");
 
 import { EntryItem } from "../models/EntryItem";
+import { EntryUpdate } from "../models/EntryUpdate";
 import { createLogger } from "../utils/logger";
 
 const XAWS = AWSXRay.captureAWS(AWS);
@@ -46,33 +47,37 @@ export class EntryAccess {
     return entry;
   }
 
-  // async updateTodo(item: TodoUpdate, userId: string): Promise<TodoUpdate> {
-  //   logger.info("DataLayer: update todo", { item });
+  async updateEntry(
+    entryUpdate: EntryUpdate,
+    userId: string
+  ): Promise<EntryUpdate> {
+    logger.info("DataLayer: update entry", { entryUpdate });
 
-  //   const params = {
-  //     TableName: this.todosTable,
-  //     Key: {
-  //       userId: userId,
-  //       todoId: item.todoId,
-  //     },
-  //     ExpressionAttributeNames: {
-  //       "#todo_name": "name",
-  //     },
-  //     ExpressionAttributeValues: {
-  //       ":name": item.name,
-  //       ":dueDate": item.dueDate,
-  //       ":done": item.done,
-  //     },
-  //     UpdateExpression:
-  //       "SET #todo_name = :name, dueDate = :dueDate, done = :done",
-  //     ReturnValues: "ALL_NEW",
-  //   };
+    const params = {
+      TableName: this.entriesTable,
+      Key: {
+        userId: userId,
+        entryId: entryUpdate.entryId,
+      },
+      ExpressionAttributeValues: {
+        ":title": entryUpdate.title,
+        ":updatedAt": entryUpdate.updatedAt,
+        ":done": entryUpdate.done,
+        ":repeatingTimes": entryUpdate.repeatingTimes,
+        ":repeated": entryUpdate.repeated,
+        ":link": entryUpdate.link,
+        ":description": entryUpdate.description,
+      },
+      UpdateExpression:
+        "SET title = :title, description = :description, repeatingTimes = :repeatingTimes, repeated = :repeated, link = :link, updatedAt = :updatedAt, done = :done",
+      ReturnValues: "ALL_NEW",
+    };
 
-  //   const result = await this.docClient.update(params).promise();
-  //   logger.info("DataLayer: update item result", { result });
+    const result = await this.docClient.update(params).promise();
+    logger.info("DataLayer: update entry item result", { result });
 
-  //   return result;
-  // }
+    return result;
+  }
 
   // async updateTodoAttachmentUrl(
   //   todoId: string,
