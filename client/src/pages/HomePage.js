@@ -39,7 +39,6 @@ class Home extends React.Component {
 
     let content;
     if (entry.link) {
-      console.log("link is there");
       content =
         `<div style="text-align: justify"> <b> Description: </b> ` +
         ` <p style="padding-top: 20px">${
@@ -73,7 +72,6 @@ class Home extends React.Component {
         } else {
           entry.done = false;
         }
-        console.log(entry);
         updateEntry(this.props.auth.getIdToken(), entry.entryId, entry).then(
           (e) => {
             this.setState({

@@ -10,7 +10,6 @@ const logger = createLogger("auth");
 const jwksUrl = "https://dev-b8waqqsd.us.auth0.com/.well-known/jwks.json";
 
 export const handler = async (event: CustomAuthorizerEvent) => {
-  console.log(event);
   logger.info("Authorizing a user", event.authorizationToken);
   try {
     const jwtToken = await verifyToken(event.authorizationToken);
@@ -50,10 +49,7 @@ export const handler = async (event: CustomAuthorizerEvent) => {
 
 async function verifyToken(authHeader) {
   const token = getToken(authHeader);
-  console.log(token);
   const jwt = decode(token, { complete: true });
-
-  console.log(jwt);
 
   let key = await getSigningKey(jwksUrl, jwt.header.kid);
 

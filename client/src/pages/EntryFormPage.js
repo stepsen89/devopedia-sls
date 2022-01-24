@@ -33,7 +33,6 @@ class EntryFormPage extends Component<CreateNewProps> {
       ...values,
       repeatingTimes: Number(values.repeatingTimes),
     };
-    console.log(values);
 
     if (values.entryId) {
       updateEntry(this.props.auth.getIdToken(), values.entryId, draft)
@@ -79,7 +78,6 @@ class EntryFormPage extends Component<CreateNewProps> {
   }
 
   componentDidMount() {
-    console.log(this.props);
     if (
       this.props &&
       this.props.location &&
@@ -88,31 +86,10 @@ class EntryFormPage extends Component<CreateNewProps> {
     ) {
       this.setState({ entry: { ...this.props.location.state } });
     }
-    console.log(this.state);
   }
-
-  componentDidUpdate(prevProps, prevState) {}
-
-  // handleSubmit = async (event: React.SyntheticEvent) => {
-  //   event.preventDefault();
-  //   console.log(values);
-  //   try {
-  //     if (!this.state.file) {
-  //       alert("File should be selected");
-  //       return;
-  //     }
-
-  //     alert("File was uploaded!");
-  //   } catch (e) {
-  //     alert("Could not upload a file: " + e);
-  //   } finally {
-  //     this.setUploadState(UploadState.NoUpload);
-  //   }
-  // };
 
   render() {
     const { entry } = this.state;
-    console.log(entry);
     return (
       <div className='container flex justify-center flex-col mx-auto mt-30'>
         <Formik
@@ -130,14 +107,13 @@ class EntryFormPage extends Component<CreateNewProps> {
               try {
                 let u = new URL(values.link);
               } catch (e) {
-                console.log(e);
+                console.error(e);
                 errors.link = "No valid link";
               }
             }
             return errors;
           }}
           onSubmit={(values, { setSubmitting }) => {
-            console.log(values);
             this.handleSubmit(values, setSubmitting, this);
           }}
           enableReinitialize
