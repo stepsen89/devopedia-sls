@@ -28,7 +28,6 @@ class Home extends React.Component {
   }
 
   onEditButtonClick = (entryId, entry) => {
-    console.log(entryId);
     this.props.history.push({
       pathname: `/entries/${entryId}/edit`,
       state: entry,
@@ -38,7 +37,6 @@ class Home extends React.Component {
   onLearnClick = (entry, index) => {
     const MySwal = withReactContent(Swal);
 
-    console.log("link", entry.link);
     let content;
     if (entry.link) {
       console.log("link is there");
@@ -65,8 +63,6 @@ class Home extends React.Component {
       cancelButtonText: entry.done ? "Cancel" : "No, not sure",
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log("has repeated it");
-        console.log(entry.repeated);
         if (entry.repeated && entry.repeated < entry.repeatingTimes) {
           entry.repeated += 1;
         } else {
@@ -92,31 +88,47 @@ class Home extends React.Component {
     });
   };
 
-  deleteEntry = async (entryId: string) => {
-    try {
-      await deleteEntry(this.props.auth.getIdToken(), entryId);
-      this.setState({
-        entries: this.state.entries.filter(
-          (entry) => entry.entryId !== entryId
-        ),
-      });
-    } catch {
-      alert("Entry deletion failed");
-    }
+  onDeleteButtonClick = async (entryId: string) => {
+    const MySwal = withReactContent(Swal);
+
+    MySwal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete entry",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        try {
+          deleteEntry(this.props.auth.getIdToken(), entryId).then((e) => {
+            MySwal.fire("Deleted!", "Your entry has been deleted.", "success");
+
+            this.setState({
+              entries: this.state.entries.filter(
+                (entry) => entry.entryId !== entryId
+              ),
+            });
+          });
+        } catch {
+          alert("Entry deletion failed");
+        }
+      }
+    });
   };
 
   render() {
     return (
       <Fragment>
-        <div className='container flex justify-center flex-col mx-auto'>
+        <div className='container flex flex-col pt-3  h-5/6'>
           <Link
-            className=' hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded w-max self-center'
+            className=' hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded w-max self-end'
             to='/entries/new'
           >
             {" "}
             Create new entry{" "}
           </Link>
-          {console.log(this.state.entries)}
           {this.state && this.state.entries && this.state.entries.length > 0 ? (
             <div className='flex flex-col mt-8 '>
               <div className='w-max self-center'>
@@ -196,12 +208,14 @@ class Home extends React.Component {
                                 </button>
                               </td>
                               <td class='px-6 py-4'>
-                                <a
-                                  href='#'
+                                <button
+                                  onClick={() =>
+                                    this.onDeleteButtonClick(entry.entryId)
+                                  }
                                   class='px-4 py-1 text-sm text-red-400 bg-red-200 rounded-full'
                                 >
                                   Delete
-                                </a>
+                                </button>
                               </td>
                             </tr>
                           );
@@ -212,7 +226,13 @@ class Home extends React.Component {
               </div>
             </div>
           ) : (
-            <h2> No entries yet </h2>
+            <div className=' self-center mt-60 text-center'>
+              <h2 className='font-bold text-2xl'> No entries yet </h2>
+              <h5 className='font-thin text-gray-900 text-lg pt-5 leading-tight'>
+                {" "}
+                Click on "Create new entry" to start your journey
+              </h5>
+            </div>
           )}
         </div>
       </Fragment>

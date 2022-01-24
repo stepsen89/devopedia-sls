@@ -2,22 +2,16 @@ import { apiEndpoint } from "../config";
 import axios from "axios";
 
 export async function getEntries(idToken) {
-  console.log(apiEndpoint);
-  console.log(idToken);
   const response = await axios.get(`${apiEndpoint}/entries`, {
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${idToken}`,
     },
   });
-  console.log(response);
   return response.data.items;
 }
 
-export async function createEntry(
-  idToken: string,
-  newEntry: CreateEntryRequest
-): Promise<EntryItem> {
+export async function createEntry(idToken, newEntry): Promise<EntryItem> {
   const response = await axios.post(
     `${apiEndpoint}/entries`,
     JSON.stringify(newEntry),
@@ -32,9 +26,9 @@ export async function createEntry(
 }
 
 export async function updateEntry(
-  idToken: string,
-  entryId: string,
-  updatedEntry: UpdateTodoRequest
+  idToken,
+  entryId,
+  updatedEntry
 ): Promise<void> {
   await axios.patch(
     `${apiEndpoint}/entries/${entryId}`,
@@ -46,4 +40,13 @@ export async function updateEntry(
       },
     }
   );
+}
+
+export async function deleteEntry(idToken: string, entryId: string) {
+  await axios.delete(`${apiEndpoint}/entries/${entryId}`, {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${idToken}`,
+    },
+  });
 }
