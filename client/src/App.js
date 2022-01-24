@@ -4,6 +4,7 @@ import { Link, Route, Router, Switch } from "react-router-dom";
 import Auth from "./auth/Auth";
 import Login from "./components/Login";
 import EntryFormPage from "./pages/EntryFormPage";
+import MainPage from "./pages/MainPage";
 import HomePage from "./pages/HomePage";
 
 export interface AppProps {
@@ -31,7 +32,7 @@ export default class App extends Component<AppProps, AppState> {
 
   render() {
     return (
-      <div className='mx-auto bg-yellow'>
+      <div className='mx-auto  container h-screen'>
         <Router history={this.props.history}>
           {this.generateMenu()}
 
@@ -42,9 +43,8 @@ export default class App extends Component<AppProps, AppState> {
   }
 
   generateMenu() {
-    console.log(this.props);
     return (
-      <div className='flex justify-end p-6 md:justify-end md:space-x-10'>
+      <div className='p-6 flex justify-end border-b-2 border-gray-400'>
         <div>{this.authButton()}</div>
       </div>
     );
@@ -56,7 +56,7 @@ export default class App extends Component<AppProps, AppState> {
         <button
           name='logout'
           onClick={this.handleLogout}
-          className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+          className='bg-white hover:bg-blue-700 text-black border-2 border-gray-500 font-bold py-2 px-4 rounded'
         >
           Log Out
         </button>
@@ -76,7 +76,7 @@ export default class App extends Component<AppProps, AppState> {
 
   generateCurrentPage() {
     if (!this.props.auth.isAuthenticated()) {
-      return <Login auth={this.props.auth} />;
+      return <MainPage />;
     }
 
     return (
