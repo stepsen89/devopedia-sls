@@ -80,7 +80,7 @@ export class EntryAccess {
   }
 
   async deleteEntry(entryId: string, userId: string) {
-    logger.info("DataLayer: delete entry ", { entryId });
+    logger.info("DataLayer: delete entry start ", { entryId });
 
     let params = {
       TableName: this.entriesTable,

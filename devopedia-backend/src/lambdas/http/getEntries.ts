@@ -7,7 +7,7 @@ import { getAllEntriesByUserId } from "../../businessLogic/entries";
 
 import { createLogger } from "../../utils/logger";
 
-const logger = createLogger("getTodos");
+const logger = createLogger("getEntries");
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -25,7 +25,7 @@ export const handler = middy(
 
     try {
       items = await getAllEntriesByUserId(userId);
-      logger.info("Get Entries: Fetching todos successfully returned:", {
+      logger.info("Get Entries: Fetching entries successfully returned:", {
         items,
       });
 

@@ -10,7 +10,7 @@ import { UpdateEntryRequest } from "../requests/UpdateEntryRequest";
 
 import { createLogger } from "../utils/logger";
 
-const logger = createLogger("todosBusinessLogic");
+const logger = createLogger("entriesBusinessLogic");
 
 const entryAccess = new EntryAccess();
 
