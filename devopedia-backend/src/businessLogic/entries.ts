@@ -1,11 +1,11 @@
-// import * as uuid from "uuid";
+import * as uuid from "uuid";
 
 import { EntryAccess } from "../dataLayer/entriesAccess";
 
 import { EntryItem } from "../models/EntryItem";
 // import { EntryUpdate } from "../models/TodoUpdate";
 
-// import { CreateTodoRequest } from "../requests/CreateTodoRequest";
+import { CreateEntryRequest } from "../requests/CreateEntryRequest";
 // import { UpdateTodoRequest } from "../requests/UpdateTodoRequest";
 
 import { createLogger } from "../utils/logger";
@@ -21,24 +21,23 @@ export async function getAllEntriesByUserId(
   return entryAccess.getAllEntriesByUserId(userId);
 }
 
-// export async function createTodo(
-//   createTodoRequest: CreateTodoRequest,
-//   userId: string
-// ): Promise<TodoItem> {
-//   logger.info("Business Logic: Create Todo");
+export async function createEntry(
+  createEntryRequest: CreateEntryRequest,
+  userId: string
+): Promise<EntryItem> {
+  logger.info("Business Logic: Create new Entry");
 
-//   const id = uuid.v4();
+  const id = uuid.v4();
 
-//   return await todosAccess.createTodo({
-//     todoId: id,
-//     userId,
-//     name: createTodoRequest.name,
-//     description: createTodoRequest.description,
-//     dueDate: createTodoRequest.dueDate,
-//     done: false, //default value for new todos
-//     createdAt: new Date().toISOString(),
-//   });
-// }
+  return await entryAccess.createEntry({
+    entryId: id,
+    userId,
+    title: createEntryRequest.title,
+    repeatingTimes: createEntryRequest.repeatingTimes,
+    description: createEntryRequest.description,
+    createdAt: new Date().toISOString(),
+  });
+}
 
 // export async function updateTodo(
 //   updateTodoRequest: UpdateTodoRequest,

@@ -34,17 +34,17 @@ export class EntryAccess {
     return items as EntryItem[];
   }
 
-  // async createTodo(item: TodoItem): Promise<TodoItem> {
-  //   logger.info("DataLayer: create todo", { item });
-  //   await this.docClient
-  //     .put({
-  //       TableName: this.todosTable,
-  //       Item: item,
-  //     })
-  //     .promise();
+  async createEntry(entry: EntryItem): Promise<EntryItem> {
+    logger.info("DataLayer: create entry", { entry });
+    await this.docClient
+      .put({
+        TableName: this.entriesTable,
+        Item: entry,
+      })
+      .promise();
 
-  //   return item;
-  // }
+    return entry;
+  }
 
   // async updateTodo(item: TodoUpdate, userId: string): Promise<TodoUpdate> {
   //   logger.info("DataLayer: update todo", { item });

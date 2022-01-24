@@ -11,7 +11,7 @@ const logger = createLogger("getTodos");
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    logger.info("Get Entries: Processing event:", { event });
+    logger.info("GetEntries: Processing event:", { event });
 
     const userId = getUserId(event);
 

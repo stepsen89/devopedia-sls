@@ -2,10 +2,9 @@ export interface EntryItem {
   userId: string;
   entryId: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   title: string;
   description: string;
+  repeatingTimes?: number;
   links?: string;
-  done: boolean;
-  repeated: number;
 }
