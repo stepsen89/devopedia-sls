@@ -24,8 +24,12 @@ class Home extends React.Component {
     }
   }
 
-  onEditButtonClick = (todoId: string) => {
-    this.props.history.push(`/entries/${todoId}/edit`);
+  onEditButtonClick = (entryId, entry) => {
+    console.log(entryId);
+    this.props.history.push({
+      pathname: `/entries/${entryId}/edit`,
+      state: entry,
+    });
   };
 
   onLearnClick = (entry) => {
@@ -149,12 +153,14 @@ class Home extends React.Component {
                                 </button>
                               </td>
                               <td class='px-6 py-4'>
-                                <a
-                                  href='#'
+                                <button
+                                  onClick={() =>
+                                    this.onEditButtonClick(entry.entryId, entry)
+                                  }
                                   class='px-4 py-1 text-sm text-blue-600 bg-blue-200 rounded-full'
                                 >
                                   Edit
-                                </a>
+                                </button>
                               </td>
                               <td class='px-6 py-4'>
                                 <a

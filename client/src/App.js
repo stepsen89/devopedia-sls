@@ -90,7 +90,15 @@ export default class App extends Component<AppProps, AppState> {
         />
 
         <Route
-          path='/entries/:entryId'
+          path='/entries/:entryId/edit'
+          exact
+          render={(props) => {
+            return <EntryFormPage {...props} auth={this.props.auth} />;
+          }}
+        />
+
+        <Route
+          path='/entries/new'
           exact
           render={(props) => {
             return <EntryFormPage {...props} auth={this.props.auth} />;

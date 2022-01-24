@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { render } from "@testing-library/react";
 import { withRouter } from "react-router-dom";
-import { createEntry } from "../api/api";
+import { createEntry, updateEntry } from "../api/api";
 import { History } from "history";
 
 import Swal from "sweetalert2";
@@ -14,7 +14,18 @@ interface CreateNewProps {
   auth: Auth;
 }
 
-class EntryFormPage extends Component {
+class EntryFormPage extends Component<CreateNewProps> {
+  state = {
+    entry: {
+      title: "",
+      description: "",
+      link: "",
+      repeated: 0,
+      repeatingTimes: "",
+      done: false,
+    },
+  };
+
   handleSubmit(values, setSubmitting, $this) {
     const MySwal = withReactContent(Swal);
     setSubmitting(false);
@@ -22,27 +33,65 @@ class EntryFormPage extends Component {
       ...values,
       repeatingTimes: Number(values.repeatingTimes),
     };
+    console.log(values);
 
-    createEntry(this.props.auth.getIdToken(), draft)
-      .then((d) => {
-        MySwal.fire({
-          title: `Your entry was added`,
-          icon: "success",
-          timer: 2500,
-          showConfirmButton: false,
+    if (values.entryId) {
+      updateEntry(this.props.auth.getIdToken(), values.entryId, draft)
+        .then((d) => {
+          MySwal.fire({
+            title: `Saved!`,
+            icon: "success",
+            timer: 2500,
+            showConfirmButton: false,
+          });
+          this.props.history.push("/");
+        })
+        .catch((e) => {
+          MySwal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+          });
+          setSubmitting(false);
+          console.error(e);
         });
-        this.props.history.push("/");
-      })
-      .catch((e) => {
-        MySwal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Something went wrong!",
+    } else {
+      createEntry(this.props.auth.getIdToken(), draft)
+        .then((d) => {
+          MySwal.fire({
+            title: `Saved!`,
+            icon: "success",
+            timer: 2500,
+            showConfirmButton: false,
+          });
+          this.props.history.push("/");
+        })
+        .catch((e) => {
+          MySwal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+          });
+          setSubmitting(false);
+          console.error(e);
         });
-        setSubmitting(false);
-        console.error(e);
-      });
+    }
   }
+
+  componentDidMount() {
+    console.log(this.props);
+    if (
+      this.props &&
+      this.props.location &&
+      this.props.location.state &&
+      this.props.location.state.entryId
+    ) {
+      this.setState({ entry: { ...this.props.location.state } });
+    }
+    console.log(this.state);
+  }
+
+  componentDidUpdate(prevProps, prevState) {}
 
   // handleSubmit = async (event: React.SyntheticEvent) => {
   //   event.preventDefault();
@@ -62,14 +111,11 @@ class EntryFormPage extends Component {
   // };
 
   render() {
+    const { entry } = this.state;
+    console.log(entry);
     return (
       <Formik
-        initialValues={{
-          title: "",
-          description: "",
-          repeatingTimes: 0,
-          link: "",
-        }}
+        initialValues={entry}
         validate={(values) => {
           const errors = {};
           if (!values.title) {
@@ -84,8 +130,9 @@ class EntryFormPage extends Component {
           console.log(values);
           this.handleSubmit(values, setSubmitting, this);
         }}
+        enableReinitialize
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting }, formProps) => (
           <Form>
             <div className='flex flex-col mb-4 w-60'>
               <label
@@ -148,7 +195,7 @@ class EntryFormPage extends Component {
               disabled={isSubmitting}
               className=' hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded'
             >
-              Create Item
+              Save
             </button>
           </Form>
         )}
