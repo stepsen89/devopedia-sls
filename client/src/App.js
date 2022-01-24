@@ -1,38 +1,102 @@
-import React from "react";
-import { Route, Switch } from "react-router-dom";
+import React, { Component } from "react";
+import { Link, Route, Router, Switch } from "react-router-dom";
 
-import Header from "./components/Header";
-import MainPage from "./pages/MainPage";
-import Loader from "./components/Loader";
-import { withAuth0 } from "@auth0/auth0-react";
-// import ProtectedRoute from "./auth/protected-route";
+import Auth from "./auth/Auth";
+import Login from "./components/Login";
+import EntryFormPage from "./pages/EntryFormPage";
+import HomePage from "./pages/HomePage";
 
-class App extends React.Component {
+export interface AppProps {
+  auth: Auth;
+  history: any;
+}
+
+export interface AppState {}
+
+export default class App extends Component<AppProps, AppState> {
+  constructor(props: AppProps) {
+    super(props);
+
+    this.handleLogin = this.handleLogin.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
+  }
+
+  handleLogin() {
+    this.props.auth.login();
+  }
+
+  handleLogout() {
+    this.props.auth.logout();
+  }
+
   render() {
-    const { isLoading } = this.props.auth0;
-    console.log(this.props);
-
-    // if (isLoading) {
-    //   return <Loader />;
-    // }
-
     return (
-      <div id='app' className='container mx-auto bg-yellow-200'>
-        <Header />
-        <div>
-          <div className='mt-5'>
-            <Switch>
-              <Route path='/' exact component={MainPage} />
-              {/* <ProtectedRoute path="/profile" component={Profile} />
-              <ProtectedRoute path="/external-api" component={ExternalApi} /> */}
-            </Switch>
-          </div>
-        </div>
-        {/* <Footer /> */}
-        <h3> here comes the footer</h3>
+      <div className='mx-auto bg-yellow'>
+        <Router history={this.props.history}>
+          {this.generateMenu()}
+
+          {this.generateCurrentPage()}
+        </Router>
       </div>
     );
   }
-}
 
-export default withAuth0(App);
+  generateMenu() {
+    console.log(this.props);
+    return (
+      <div className='flex justify-end p-6 md:justify-end md:space-x-10'>
+        <div>{this.authButton()}</div>
+      </div>
+    );
+  }
+
+  authButton() {
+    if (this.props.auth.isAuthenticated()) {
+      return (
+        <button
+          name='logout'
+          onClick={this.handleLogout}
+          className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+        >
+          Log Out
+        </button>
+      );
+    } else {
+      return (
+        <button
+          name='login'
+          onClick={this.handleLogin}
+          className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+        >
+          Log In
+        </button>
+      );
+    }
+  }
+
+  generateCurrentPage() {
+    if (!this.props.auth.isAuthenticated()) {
+      return <Login auth={this.props.auth} />;
+    }
+
+    return (
+      <Switch>
+        <Route
+          path='/'
+          exact
+          render={(props) => {
+            return <HomePage {...props} auth={this.props.auth} />;
+          }}
+        />
+
+        <Route
+          path='/entries/:entryId'
+          exact
+          render={(props) => {
+            return <EntryFormPage {...props} auth={this.props.auth} />;
+          }}
+        />
+      </Switch>
+    );
+  }
+}
