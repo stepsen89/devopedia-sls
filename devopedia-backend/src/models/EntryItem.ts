@@ -8,4 +8,5 @@ export interface EntryItem {
   repeatingTimes?: number;
   link?: string;
   done: boolean;
+  repeated?: number;
 }

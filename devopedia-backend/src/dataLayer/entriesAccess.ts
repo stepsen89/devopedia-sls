@@ -79,67 +79,25 @@ export class EntryAccess {
     return result;
   }
 
-  // async updateTodoAttachmentUrl(
-  //   todoId: string,
-  //   userId: string
-  // ): Promise<TodoItem> {
-  //   logger.info("DataLayer: update todo with attachment url", { todoId });
+  async deleteEntry(entryId: string, userId: string) {
+    logger.info("DataLayer: delete entry ", { entryId });
 
-  //   const todoAttachmentUrl = `https://${this.bucket}.s3.amazonaws.com/${todoId}`;
+    let params = {
+      TableName: this.entriesTable,
+      Key: {
+        entryId: entryId,
+        userId: userId,
+      },
+    };
 
-  //   const params = {
-  //     TableName: this.todosTable,
-  //     Key: {
-  //       userId: userId,
-  //       todoId: todoId,
-  //     },
-  //     ExpressionAttributeNames: {
-  //       "#todo_attachmentUrl": "attachmentUrl",
-  //     },
-  //     ExpressionAttributeValues: {
-  //       ":attachmentUrl": todoAttachmentUrl,
-  //     },
-  //     UpdateExpression: "SET #todo_attachmentUrl = :attachmentUrl",
-  //     ReturnValues: "ALL_NEW",
-  //   };
+    try {
+      await this.docClient.delete(params).promise();
 
-  //   const result = await this.docClient.update(params).promise();
-
-  //   logger.info(`Update statement has completed without error`, {
-  //     result: result,
-  //   });
-  //   return result;
-  // }
-
-  // async deleteTodo(todoId: string, userId: string) {
-  //   logger.info("DataLayer: delete todo ", { todoId });
-
-  //   let params = {
-  //     TableName: this.todosTable,
-  //     Key: {
-  //       todoId: todoId,
-  //       userId: userId,
-  //     },
-  //   };
-
-  //   try {
-  //     await this.docClient.delete(params).promise();
-
-  //     logger.info("DataLayer: delete todo success", { todoId });
-
-  //     const deleteObjectParams = { Bucket: this.bucket, Key: todoId };
-
-  //     this.s3Client.deleteObject(deleteObjectParams, function (err, data) {
-  //       if (err) {
-  //         logger.error("DataLayer: delete associated image failure", { err });
-  //       } else {
-  //         logger.info("DataLayer: delete associated image success", { data });
-  //       }
-  //     });
-  //   } catch (error) {
-  //     logger.info("DataLayer: delete todo success", { todoId });
-  //   }
-  // }
+      logger.info("DataLayer: delete entry success", { entryId });
+    } catch (error) {
+      logger.info("DataLayer: delete entry failure", { error });
+    }
+  }
 }
 
 function createDynamoDBClient() {

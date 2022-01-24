@@ -35,6 +35,7 @@ export async function createEntry(
     done: createEntryRequest.done,
     title: createEntryRequest.title,
     repeatingTimes: createEntryRequest.repeatingTimes,
+    repeated: 0,
     description: createEntryRequest.description,
     link: createEntryRequest.link,
     createdAt: new Date().toISOString(),
@@ -63,7 +64,7 @@ export async function updateEntry(
   );
 }
 
-// export async function deleteTodo(todoId: string, userId: string) {
-//   logger.info("Business Logic: Delete Todo");
-//   return await todosAccess.deleteTodo(todoId, userId);
-// }
+export async function deleteEntry(entryId: string, userId: string) {
+  logger.info("Business Logic: Delete Entry");
+  return await entryAccess.deleteEntry(entryId, userId);
+}
