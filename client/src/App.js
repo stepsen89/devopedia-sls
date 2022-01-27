@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { Link, Route, Router, Switch } from "react-router-dom";
+import { Route, Router, Switch } from "react-router-dom";
 
 import Auth from "./auth/Auth";
-import Login from "./components/Login";
 import EntryFormPage from "./pages/EntryFormPage";
 import MainPage from "./pages/MainPage";
 import HomePage from "./pages/HomePage";
+import NotFound from "./components/NotFound";
 
 export interface AppProps {
   auth: Auth;
@@ -75,6 +75,7 @@ export default class App extends Component<AppProps, AppState> {
   }
 
   generateCurrentPage() {
+    console.log(this.props.auth);
     if (!this.props.auth.isAuthenticated()) {
       return <MainPage />;
     }
@@ -104,6 +105,8 @@ export default class App extends Component<AppProps, AppState> {
             return <EntryFormPage {...props} auth={this.props.auth} />;
           }}
         />
+
+        <Route path='/*' exact component={NotFound} />
       </Switch>
     );
   }

@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { render } from "@testing-library/react";
 import { withRouter } from "react-router-dom";
 import { createEntry, updateEntry } from "../api/api";
-import { History } from "history";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -105,9 +103,8 @@ class EntryFormPage extends Component<CreateNewProps> {
 
             if (values.link) {
               try {
-                let u = new URL(values.link);
+                new URL(values.link);
               } catch (e) {
-                console.error(e);
                 errors.link = "No valid link";
               }
             }
@@ -118,7 +115,7 @@ class EntryFormPage extends Component<CreateNewProps> {
           }}
           enableReinitialize
         >
-          {({ isSubmitting }, formProps) => (
+          {({ isSubmitting }) => (
             <div className='mx-10'>
               <h3 className='text-2xl text-gray-500 font-bold mb-10 mt-10'>
                 {" "}
@@ -173,16 +170,15 @@ class EntryFormPage extends Component<CreateNewProps> {
                   >
                     Repeating times
                   </label>
-                  <div className='mt-1 w-60 bg-gray-600 rounded-md border-6 border-gray-700'>
+                  <div className='mt-1 w-60  rounded-md border-6 border-gray-700'>
                     <Field
-                      className='flex items-center p-2 bg-gray-600 rounded-md border-6 border-gray-700'
+                      className='flex items-center p-2 rounded-md border-6 border-gray-700 w-60 h-8'
                       as='select'
                       name='repeatingTimes'
-                      className='w-60 h-8'
                     >
                       <option
-                        className='bg-gray-100 rounded-md border-6 border-gray-700'
-                        value={"onn"}
+                        className='bg-gray-100 rounded-md border-6 border-gray-700 p-4'
+                        value={""}
                       >
                         Please select
                       </option>

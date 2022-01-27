@@ -1,17 +1,17 @@
 import React, { Fragment } from "react";
 import { getEntries } from "../api/api";
 import { Link } from "react-router-dom";
-import { authConfig } from "../config";
 import dateFormat from "dateformat";
 import update from "immutability-helper";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { updateEntry, deleteEntry } from "../api/api";
+import Loader from "../components/Loader";
 class Home extends React.Component {
   state = {
     testing: true,
-    loadingEntries: false,
+    loadingEntries: true,
     entries: [],
   };
 
@@ -127,7 +127,10 @@ class Home extends React.Component {
             {" "}
             Create new entry{" "}
           </Link>
-          {this.state && this.state.entries && this.state.entries.length > 0 ? (
+          {this.state &&
+          this.state.entries &&
+          this.state.entries.length > 0 &&
+          this.state.loadingEntries === false ? (
             <div className='flex flex-col mt-8 '>
               <div className='w-max self-center'>
                 <div className='border-b border-gray-200 shadow'>
@@ -162,14 +165,17 @@ class Home extends React.Component {
                         this.state.entries &&
                         this.state.entries.map((entry, index) => {
                           return (
-                            <tr class='whitespace-nowrap' key={entry.entryId}>
-                              <td class='px-6 py-4 text-sm text-gray-500'>
-                                <div class='text-sm text-gray-900'>
+                            <tr
+                              className='whitespace-nowrap'
+                              key={entry.entryId}
+                            >
+                              <td className='px-6 py-4 text-sm text-gray-500'>
+                                <div className='text-sm text-gray-900'>
                                   {entry.title}
                                 </div>
                               </td>
-                              <td class='px-6 py-4'>
-                                <div class='text-sm text-gray-500'>
+                              <td className='px-6 py-4'>
+                                <div className='text-sm text-gray-500'>
                                   {entry.repeatingTimes
                                     ? `${
                                         entry.repeated ? entry.repeated : "0"
@@ -177,40 +183,40 @@ class Home extends React.Component {
                                     : " - "}
                                 </div>
                               </td>
-                              <td class='px-6 py-4'>
-                                <div class='text-sm text-gray-500'>
+                              <td className='px-6 py-4'>
+                                <div className='text-sm text-gray-500'>
                                   {entry.done ? "DONE" : ""}
                                 </div>
                               </td>
-                              <td class='px-6 py-4 text-sm text-gray-500'>
+                              <td className='px-6 py-4 text-sm text-gray-500'>
                                 {dateFormat(entry.createdAt, "dd/mm/yyyy")}
                               </td>
-                              <td class='px-6 py-4'>
+                              <td className='px-6 py-4'>
                                 <button
                                   onClick={() =>
                                     this.onLearnClick(entry, index)
                                   }
-                                  class='px-4 py-1 text-sm text-black bg-yellow-200 rounded-full border-2 border-black'
+                                  className='px-4 py-1 text-sm text-black bg-yellow-200 rounded-full border-2 border-black'
                                 >
                                   {entry.done ? "View" : "Learn"}
                                 </button>
                               </td>
-                              <td class='px-6 py-4'>
+                              <td className='px-6 py-4'>
                                 <button
                                   onClick={() =>
                                     this.onEditButtonClick(entry.entryId, entry)
                                   }
-                                  class='px-4 py-1 text-sm text-blue-600 bg-blue-200 rounded-full'
+                                  className='px-4 py-1 text-sm text-blue-600 bg-blue-200 rounded-full'
                                 >
                                   Edit
                                 </button>
                               </td>
-                              <td class='px-6 py-4'>
+                              <td className='px-6 py-4'>
                                 <button
                                   onClick={() =>
                                     this.onDeleteButtonClick(entry.entryId)
                                   }
-                                  class='px-4 py-1 text-sm text-red-400 bg-red-200 rounded-full'
+                                  className='px-4 py-1 text-sm text-red-400 bg-red-200 rounded-full'
                                 >
                                   Delete
                                 </button>
@@ -223,6 +229,8 @@ class Home extends React.Component {
                 </div>
               </div>
             </div>
+          ) : this.state.loadingEntries ? (
+            <Loader />
           ) : (
             <div className=' self-center mt-60 text-center'>
               <h2 className='font-bold text-2xl'> No entries yet </h2>
