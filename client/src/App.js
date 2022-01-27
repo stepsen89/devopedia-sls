@@ -76,7 +76,6 @@ export default class App extends Component<AppProps, AppState> {
   }
 
   generateCurrentPage() {
-    console.log(this.props.auth);
     if (!this.props.auth.isAuthenticated()) {
       return <MainPage />;
     }

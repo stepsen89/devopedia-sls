@@ -31,7 +31,6 @@ class UploadFilePage extends PureComponent<
 
   handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    console.log(files)
     if (!files) return
 
     this.setState({

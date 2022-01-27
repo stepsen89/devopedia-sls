@@ -42,7 +42,6 @@ class Home extends React.Component {
 
   onLearnClick = (entry, index) => {
     const MySwal = withReactContent(Swal);
-    console.log(entry);
 
     let content;
     let image;
