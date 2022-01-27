@@ -34,19 +34,29 @@ class Home extends React.Component {
     });
   };
 
+  uploadFileClick = (entryId, entry) => {
+    this.props.history.push({
+      pathname: `/entries/${entryId}/file`,
+    });
+  };
+
   onLearnClick = (entry, index) => {
     const MySwal = withReactContent(Swal);
+    console.log(entry);
 
     let content;
+    let image;
+    if (entry.fileUrl) {
+      image = `<div style="text-align: left; margin-top: 15px"><b> File/Screenshot: </b> <img src=${entry.fileUrl} alt=${entry.fileName} width="100px" height="100px" style="text-align: left; margin-top: 10px"/>`
+    }
     if (entry.link) {
       content =
         `<div style="text-align: justify"> <b> Description: </b> ` +
-        ` <p style="padding-top: 20px">${
-          entry.description || "Oh nothing here .... "
+        ` <p style="padding-top: 20px">${entry.description || "Oh nothing here .... "
         } </p></div> ` +
         `<hr style="padding-bottom: 20px; margin-top: 20px">` +
-        `<div style="text-align: left"><b>More info:</b> ` +
-        `<a href=${entry.link} target="_blank" style="color: blue" >${entry.link}</a></div>`;
+        `<div style="text-align: left; margin-top: 15px"><b>More info:</b> ` +
+        `<a href=${entry.link} target="_blank" style="color: blue; margin-top: 15px" >${entry.link}</a></div>` + image;
     } else {
       content = `${entry.description || "no description"} `;
     }
@@ -54,7 +64,6 @@ class Home extends React.Component {
     MySwal.fire({
       title: entry.title,
       text: entry.description,
-      icon: "question",
       html: content,
       showConfirmButton: entry.done ? false : true,
       showCancelButton: true,
@@ -128,9 +137,9 @@ class Home extends React.Component {
             Create new entry{" "}
           </Link>
           {this.state &&
-          this.state.entries &&
-          this.state.entries.length > 0 &&
-          this.state.loadingEntries === false ? (
+            this.state.entries &&
+            this.state.entries.length > 0 &&
+            this.state.loadingEntries === false ? (
             <div className='flex flex-col mt-8 '>
               <div className='w-max self-center'>
                 <div className='border-b border-gray-200 shadow'>
@@ -151,6 +160,9 @@ class Home extends React.Component {
                         </th>
                         <th className='px-6 py-2 text-xs text-gray-500'>
                           Action
+                        </th>
+                        <th className='px-6 py-2 text-xs text-gray-500'>
+                          Upload
                         </th>
                         <th className='px-6 py-2 text-xs text-gray-500'>
                           Edit
@@ -177,9 +189,8 @@ class Home extends React.Component {
                               <td className='px-6 py-4'>
                                 <div className='text-sm text-gray-500'>
                                   {entry.repeatingTimes
-                                    ? `${
-                                        entry.repeated ? entry.repeated : "0"
-                                      } / ${entry.repeatingTimes}`
+                                    ? `${entry.repeated ? entry.repeated : "0"
+                                    } / ${entry.repeatingTimes}`
                                     : " - "}
                                 </div>
                               </td>
@@ -199,6 +210,16 @@ class Home extends React.Component {
                                   className='px-4 py-1 text-sm text-black bg-yellow-200 rounded-full border-2 border-black'
                                 >
                                   {entry.done ? "View" : "Learn"}
+                                </button>
+                              </td>
+                              <td className='px-6 py-4'>
+                                <button
+                                  onClick={() =>
+                                    this.uploadFileClick(entry.entryId)
+                                  }
+                                  className='px-4 py-1 text-sm text-black bg-green-200 rounded-full border-2 border-black'
+                                >
+                                  Upload File
                                 </button>
                               </td>
                               <td className='px-6 py-4'>

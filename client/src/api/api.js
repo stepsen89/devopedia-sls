@@ -50,3 +50,20 @@ export async function deleteEntry(idToken: string, entryId: string) {
     },
   });
 }
+
+export async function getUploadUrl(
+  idToken: string,
+  entryId: string
+) {
+  const response = await axios.post(`${apiEndpoint}/entries/${entryId}/file`, '', {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
+    }
+  })
+  return response.data.uploadUrl
+}
+
+export async function uploadFile(uploadUrl: string, file: Buffer) {
+  await axios.put(uploadUrl, file)
+}

@@ -6,13 +6,14 @@ import EntryFormPage from "./pages/EntryFormPage";
 import MainPage from "./pages/MainPage";
 import HomePage from "./pages/HomePage";
 import NotFound from "./components/NotFound";
+import UploadFilePage from "./pages/UploadFilePage";
 
 export interface AppProps {
   auth: Auth;
   history: any;
 }
 
-export interface AppState {}
+export interface AppState { }
 
 export default class App extends Component<AppProps, AppState> {
   constructor(props: AppProps) {
@@ -95,6 +96,14 @@ export default class App extends Component<AppProps, AppState> {
           exact
           render={(props) => {
             return <EntryFormPage {...props} auth={this.props.auth} />;
+          }}
+        />
+
+        <Route
+          path='/entries/:entryId/file'
+          exact
+          render={(props) => {
+            return <UploadFilePage {...props} auth={this.props.auth} />;
           }}
         />
 
