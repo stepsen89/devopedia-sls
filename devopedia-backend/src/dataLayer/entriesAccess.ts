@@ -12,8 +12,9 @@ const logger = createLogger("EntriesAccess");
 export class EntryAccess {
   constructor(
     private readonly docClient = createDynamoDBClient(),
-    private readonly entriesTable = process.env.ENTRIES_TABLE
-  ) {}
+    private readonly entriesTable = process.env.ENTRIES_TABLE,
+    private readonly bucket = process.env.FILES_BUCKET_NAME
+  ) { }
 
   async getAllEntriesByUserId(userId: string): Promise<EntryItem[]> {
     logger.info("DataLayer: Get All Entries By User id");
@@ -98,6 +99,37 @@ export class EntryAccess {
       logger.info("DataLayer: delete entry failure", { error });
     }
   }
+  async updateEntryFileUrl(
+    entryId: string,
+    userId: string
+  ): Promise<EntryItem> {
+    logger.info('DataLayer: update entry with file url', { entryId })
+
+    const entryFileUrl = `https://${this.bucket}.s3.amazonaws.com/${entryId}`
+
+    const params = {
+      TableName: this.entriesTable,
+      Key: {
+        userId: userId,
+        entryId: entryId
+      },
+      ExpressionAttributeNames: {
+        '#entry_fileUrl': 'fileUrl'
+      },
+      ExpressionAttributeValues: {
+        ':fileUrl': entryFileUrl
+      },
+      UpdateExpression: 'SET #entry_fileUrl = :fileUrl',
+      ReturnValues: 'ALL_NEW'
+    }
+
+    const result = await this.docClient.update(params).promise()
+
+    logger.info(`Update statement has completed without error`, {
+      result: result
+    })
+    return result
+  }
 }
 
 function createDynamoDBClient() {
@@ -110,3 +142,4 @@ function createDynamoDBClient() {
 
   return new XAWS.DynamoDB.DocumentClient();
 }
+

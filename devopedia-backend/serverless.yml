@@ -25,6 +25,8 @@ provider:
   environment:
     ENTRIES_TABLE: Entries-${self:provider.stage}
     ENTRY_CREATED_AT_INDEX: CreatedAtIndex
+    FILES_BUCKET_NAME: ud-project-files-bucket-${self:provider.stage}
+    SIGNED_URL_EXPIRATION: 500
 
 functions:
   Auth:
@@ -91,6 +93,26 @@ functions:
           - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ENTRIES_TABLE}
 
+  GetUploadUrl:
+    handler: src/lambdas/http/getUploadUrl.handler
+    events:
+      - http:
+          method: post
+          path: entries/{entryId}/file
+          authorizer: Auth
+          cors: true
+          reqValidatorName: RequestBodyValidator
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.FILES_BUCKET_NAME}/*
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ENTRIES_TABLE}
+
 resources:
   Resources:
     GatewayResponseDefault4XX:
@@ -139,7 +161,35 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+
+    FileBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.FILES_BUCKET_NAME}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: MyPolicy
+          Version: '2012-10-17'
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.FILES_BUCKET_NAME}/*'
+        Bucket: !Ref FileBucket

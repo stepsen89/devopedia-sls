@@ -9,4 +9,5 @@ export interface EntryItem {
   link?: string;
   done: boolean;
   repeated?: number;
+  fileUrl?: string
 }
